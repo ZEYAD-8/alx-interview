@@ -1,86 +1,39 @@
 #!/usr/bin/python3
-
 """
-0-validate_utf8
+0-validate_utf8 module
 """
 
 
-def validUTF8_v1(data):
-    """
-    Determines if a given data set
-    represents a valid UTF-8 encoding
-    """
-    count = 0
+def validUTF8(data) -> bool:
+    """Determines if a given data set represents a valid UTF-8 encoding"""
 
-    if not data:
-        return False
+    def byte_sequence_count(byte):
+        """Returns the number of bytes in a UTF-8 sequence"""
+        leading_ones = 0
+        while (byte >> 7 - leading_ones) & 1:
+            leading_ones += 1
+        return leading_ones
 
-    for num in data:
-        bin_rep = format(num, '#010b')[-8:]
+    i = 0
+    # 11000010 10000000 11000010 10000000
+    # 01000010
+    while i < len(data):
+        sequence_count = byte_sequence_count(data[i])
 
-        if count == 0:
-            for bit in bin_rep:
-                if bit == '0':
-                    break
-                count += 1
+        if sequence_count == 0:
+            i += 1
+            continue
 
-            if count == 0:
-                continue
+        if sequence_count == 1 or sequence_count > 4:
+            return False
 
-            if count == 1 or count > 4:
+        if i + sequence_count > len(data):
+            return False
+        # 11000010 10000000
+        for j in range(1, sequence_count):
+            if not (data[i + j] >> 6 == 0b10):
                 return False
-        else:
-            if not (bin_rep[0] == '1' and bin_rep[1] == '0'):
-                return False
-    return count == 0
 
+        i += sequence_count
 
-def validUTF8(data):
-    count = 0
-
-    if data is None:
-        return False
-
-    for num in data:
-        if count == 0:
-            if num & 128 == 0:
-                count = 0
-            elif num & 224 == 192:
-                count = 1
-            elif num & 240 == 224:
-                count = 2
-            elif num & 248 == 240:
-                count = 3
-            else:
-                return False
-        else:
-            if num & 192 != 128:
-                return False
-    if count == 0:
-        return True
-    return False
-
-
-def validUTF8_v4(data):
-    n_bytes = 0
-
-    mask1 = 1 << 7
-    mask2 = 1 << 6
-
-    for num in data:
-        mask = 1 << 7
-        if n_bytes == 0:
-            while mask & num:
-                n_bytes += 1
-                mask = mask >> 1
-
-            if n_bytes == 0:
-                continue
-
-            if n_bytes == 1 or n_bytes > 4:
-                return False
-        else:
-            if not (num & mask1 and not (num & mask2)):
-                return False
-        n_bytes -= 1
-        return n_bytes == 0
+    return True
