@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-"""Making Change module.
+"""
+Making Change module.
 """
 
 
