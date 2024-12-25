@@ -3,6 +3,7 @@
 Making Change module.
 This module contains the makeChange function.
 """
+# import math
 
 
 def makeChange(coins, total):
@@ -16,10 +17,11 @@ def makeChange(coins, total):
         return 0
 
     # set up the variables
-    change = total, count = 0, idx = 0
+    change = total
+    count = idx = 0
 
     # Sort the coins for indexed addressing
-    sorted = sorted(coins, reverse=True)
+    ordered = sorted(coins, reverse=True)
     length = len(coins)
 
     # loop to calculate
@@ -28,12 +30,22 @@ def makeChange(coins, total):
         if idx >= length:
             return -1
         # if the current coin can be subtracted from the change
-        if change - sorted[idx] >= 0:
-            # do so and add 1 to the count
-            change -= sorted[idx]
+        if change - ordered[idx] >= 0:
+            # do so and add to the count
+            change -= ordered[idx]
             count += 1
         # if not, then this coin will no longer be used, move to a smaller one.
         else:
             idx += 1
-
     return count
+
+    # for coin in ordered:
+    #     if change <= 0:
+    #         break
+    #     if change - coin >= 0:
+    #         r = math.floor(math.log(change, coin))
+    #         change -= r * coin
+    #         count += r
+    # if change != 0:
+    #     return -1
+    # return count
